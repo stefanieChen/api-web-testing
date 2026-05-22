@@ -98,6 +98,7 @@ export async function searchUniqlo(page: Page, keyword: string): Promise<void> {
 
   if (!openedSearchInput) {
     test.skip(true, 'Search input did not appear after opening the search control');
+    return;
   }
 
   await openedSearchInput.fill(keyword);
