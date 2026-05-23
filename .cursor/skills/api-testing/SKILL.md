@@ -9,9 +9,7 @@ paths:
 
 # API Testing Skill: pytest + requests for UNIQLO China
 
-Use this skill to generate or update API tests for this repository. The target stack is Python `pytest` + `requests`. API tests should exercise real, read-only UNIQLO China endpoints discovered from `https://www.uniqlo.cn` page traffic.
-
-The original PoC can use JSONPlaceholder when a deterministic public API is needed, but this repository's API demo should prefer UNIQLO China APIs so API tests and Web UI tests validate the same product surface.
+Use this skill to generate or update API tests for this repository. The target stack is Python `pytest` + `requests`. API tests should exercise real, read-only UNIQLO China endpoints discovered from `https://www.uniqlo.cn` page traffic so API tests and Web UI tests validate the same product surface.
 
 ## Discovered API surface
 

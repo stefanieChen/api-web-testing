@@ -8,9 +8,7 @@
 - Web UI 演示对象：优衣库中国官网 (`https://www.uniqlo.cn`)
 - 交付重点：`.cursor/skills/*/SKILL.md` 中的 Agent 指引，而不是测试代码本身
 
-### 为什么不继续使用 JSONPlaceholder
-
-第一版 PoC 使用 JSONPlaceholder，是因为它公开、稳定、无鉴权、几乎不会反爬，适合作为“pytest + requests 结构演示”的最低风险对象。根据本次验证目标，API 测试和 Web UI 测试应尽量围绕同一个真实业务站点，因此现在 API 测试已切换为优衣库中国站的真实只读接口。
+### 当前 API 测试目标
 
 通过 Playwright 抓取 `www.uniqlo.cn` 首页和 `/c/3wtshirt.html` 分类页网络请求，确认可用于演示的接口包括：
 
@@ -172,6 +170,20 @@ npm run test:web
 API 测试也访问优衣库 live endpoints。如果接口返回 403、429、5xx 或网络不可达，测试 helper 会将其标记为环境 skip；如果接口正常返回 JSON，则会执行真实的 schema、类型和业务语义断言。
 
 ## 6. Cursor Cloud Agent 演示流程
+
+### Skills 怎么运行/触发
+
+Cursor Skill 不是一个需要手动执行的脚本，而是一份给 Agent 读取的任务说明。运行方式有两种：
+
+1. **显式触发**：在 Cursor Agent Chat 里输入 `/api-testing` 或 `/web-ui-testing`，然后继续写你的需求。这样 Agent 会明确加载对应 Skill。
+2. **自动匹配**：直接让 Agent 修改 `tests/api/**/*.py` 或 `tests/web/**/*.ts`，Cursor 会根据 `SKILL.md` 的 `description` 和 `paths` 判断是否把相关 Skill 提供给 Agent。
+
+Skill 被触发后，Agent 会根据 `SKILL.md` 中的约定去写代码、复用 helper、选择测试命令并运行验证。真正被运行的是测试命令，例如：
+
+```bash
+python3 -m pytest tests/api -q
+npm run test:web
+```
 
 ### 步骤 A：确认 Skill 可被发现
 
