@@ -3,10 +3,23 @@
 本仓库是一套从零搭建的 Cursor Skills PoC，用来验证：通过编写 Cursor Skills，引导 Cursor IDE 的 Cloud Agent 自动生成并运行 API 测试与 Web UI 测试。
 
 - API 测试栈：Python + pytest + requests
-- API 演示对象：JSONPlaceholder (`https://jsonplaceholder.typicode.com`)
+- API 演示对象：优衣库中国官网真实只读接口（从 `https://www.uniqlo.cn` 页面网络请求中探索得到）
 - Web UI 测试栈：Playwright + TypeScript
 - Web UI 演示对象：优衣库中国官网 (`https://www.uniqlo.cn`)
 - 交付重点：`.cursor/skills/*/SKILL.md` 中的 Agent 指引，而不是测试代码本身
+
+### 为什么不继续使用 JSONPlaceholder
+
+第一版 PoC 使用 JSONPlaceholder，是因为它公开、稳定、无鉴权、几乎不会反爬，适合作为“pytest + requests 结构演示”的最低风险对象。根据本次验证目标，API 测试和 Web UI 测试应尽量围绕同一个真实业务站点，因此现在 API 测试已切换为优衣库中国站的真实只读接口。
+
+通过 Playwright 抓取 `www.uniqlo.cn` 首页和 `/c/3wtshirt.html` 分类页网络请求，确认可用于演示的接口包括：
+
+- `GET https://d.uniqlo.cn/p/hmall-bd-service/recommendWord/getRecommendWord/zh_CN`
+- `POST https://d.uniqlo.cn/p/hmall-sc-service/search/searchCategoryInfo/zh_CN`
+- `POST https://d.uniqlo.cn/p/hmall-sc-service/search/searchWithCategoryCodeAndConditions/zh_CN`
+- `GET https://www.uniqlo.cn/data/shop_classification_PC.json`
+
+这些接口无需登录，适合做 Cloud Agent demo。测试仍会保留 live-site skip 策略，因为公开商业站点可能对云环境限流、阻断或临时调整响应结构。
 
 ## 1. Cursor Skills 机制说明
 
@@ -72,8 +85,8 @@ paths:
 ├── tests/
 │   ├── api/
 │   │   ├── conftest.py
-│   │   ├── test_jsonplaceholder_posts.py
-│   │   └── test_jsonplaceholder_users.py
+│   │   ├── test_uniqlo_category_search.py
+│   │   └── test_uniqlo_site_data.py
 │   └── web/
 │       ├── navigation.spec.ts
 │       ├── search.spec.ts
@@ -95,9 +108,9 @@ paths:
 | `.cursor/skills/web-ui-testing/SKILL.md` | Web UI 测试 Skill，指导 Agent 用 Playwright + TypeScript 生成优衣库中文站 E2E 测试 |
 | `requirements.txt` | Python API 测试依赖：pytest、requests |
 | `pytest.ini` | pytest 发现规则、严格 marker、API 测试目录配置 |
-| `tests/api/conftest.py` | API 测试共享 fixtures：base URL、requests session、请求失败 skip、JSON 断言 |
-| `tests/api/test_jsonplaceholder_posts.py` | JSONPlaceholder posts API 的读取与创建演示测试 |
-| `tests/api/test_jsonplaceholder_users.py` | JSONPlaceholder users/posts 查询演示测试 |
+| `tests/api/conftest.py` | API 测试共享 fixtures：优衣库 API/web base URL、requests session、请求失败 skip、JSON/Hmall envelope 断言 |
+| `tests/api/test_uniqlo_category_search.py` | 优衣库 `hmall-sc-service` 分类元数据与商品列表接口演示测试 |
+| `tests/api/test_uniqlo_site_data.py` | 优衣库推荐词接口与 PC 分类 JSON 资源演示测试 |
 | `package.json` | Node 项目与 Playwright 测试脚本 |
 | `tsconfig.json` | TypeScript 编译/类型检查配置 |
 | `playwright.config.ts` | Playwright 配置：Chromium、中文 locale、上海时区、trace/screenshot/video |
@@ -119,8 +132,8 @@ paths:
 
 API 演示测试：
 
-- `tests/api/test_jsonplaceholder_posts.py`
-- `tests/api/test_jsonplaceholder_users.py`
+- `tests/api/test_uniqlo_category_search.py`
+- `tests/api/test_uniqlo_site_data.py`
 
 Web UI 演示测试：
 
@@ -156,6 +169,8 @@ npm run test:web
 
 如果 cloud runner 被优衣库官网反爬或限流，Web 测试会以明确原因 skip；如果页面正常加载，测试会继续执行真实断言。
 
+API 测试也访问优衣库 live endpoints。如果接口返回 403、429、5xx 或网络不可达，测试 helper 会将其标记为环境 skip；如果接口正常返回 JSON，则会执行真实的 schema、类型和业务语义断言。
+
 ## 6. Cursor Cloud Agent 演示流程
 
 ### 步骤 A：确认 Skill 可被发现
@@ -173,21 +188,21 @@ npm run test:web
 
 ```text
 /api-testing
-请基于当前仓库的 API 测试约定，为 JSONPlaceholder 的 comments 资源新增 pytest + requests 测试。
-要求：放在 tests/api/test_jsonplaceholder_comments.py；复用 conftest.py 里的 fixtures；覆盖按 postId 查询 comments，并断言返回列表、postId、email 格式和 body/title 字段；最后运行 python3 -m pytest tests/api -q。
+请基于当前仓库的 API 测试约定，为优衣库中国官网的 hmall-sc-service 新增一个 pytest + requests 测试。
+要求：放在 tests/api/test_uniqlo_product_listing.py；复用 conftest.py 里的 fixtures；使用 searchWithCategoryCodeAndConditions/zh_CN 查询 3wtshirt 分类；断言 success、resp 分段、筛选项、商品 code/name/price/stock 字段；最后运行 python3 -m pytest tests/api -q。
 ```
 
 也可以测试自动匹配：
 
 ```text
-请在 tests/api 下新增 JSONPlaceholder comments API 测试，遵循本仓库 API 测试风格，并运行 API 测试。
+请在 tests/api 下新增一个优衣库中国官网推荐词 API 测试，遵循本仓库 API 测试风格，并运行 API 测试。
 ```
 
 预期 Agent 行为：
 
 1. 读取 `api-testing` Skill。
-2. 使用 `api_client`、`api_base_url`、`request_or_skip`、`assert_json_response`。
-3. 生成 `tests/api/test_jsonplaceholder_comments.py`。
+2. 使用 `api_client`、`api_base_url`、`uniqlo_web_base_url`、`request_or_skip`、`assert_json_response`、`assert_hmall_success`。
+3. 生成 `tests/api/test_uniqlo_<resource>.py`。
 4. 运行 `python3 -m pytest tests/api -q`。
 5. 汇报 pass/skip/fail。
 

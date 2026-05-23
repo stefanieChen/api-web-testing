@@ -8,13 +8,20 @@ import pytest
 import requests
 from requests import Response, Session
 
-DEFAULT_BASE_URL = "https://jsonplaceholder.typicode.com"
+DEFAULT_UNIQLO_API_BASE_URL = "https://d.uniqlo.cn/p"
+DEFAULT_UNIQLO_WEB_BASE_URL = "https://www.uniqlo.cn"
 
 
 @pytest.fixture(scope="session")
 def api_base_url() -> str:
-    """Base URL for JSONPlaceholder-compatible demo APIs."""
-    return os.getenv("JSONPLACEHOLDER_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
+    """Base URL for UNIQLO China service APIs discovered from site traffic."""
+    return os.getenv("UNIQLO_API_BASE_URL", DEFAULT_UNIQLO_API_BASE_URL).rstrip("/")
+
+
+@pytest.fixture(scope="session")
+def uniqlo_web_base_url() -> str:
+    """Base URL for UNIQLO China public web JSON assets."""
+    return os.getenv("UNIQLO_WEB_BASE_URL", DEFAULT_UNIQLO_WEB_BASE_URL).rstrip("/")
 
 
 @pytest.fixture(scope="session")
@@ -22,9 +29,15 @@ def api_client() -> Session:
     session = requests.Session()
     session.headers.update(
         {
-            "Accept": "application/json",
+            "Accept": "application/json,text/plain,*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9",
             "Content-Type": "application/json",
-            "User-Agent": "cursor-skills-api-tests/1.0",
+            "Referer": f"{DEFAULT_UNIQLO_WEB_BASE_URL}/",
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 "
+                "CursorSkillsPoC/1.0"
+            ),
         }
     )
     yield session
@@ -56,3 +69,13 @@ def assert_json_response() -> Callable[[Response, int], Any]:
         return response.json()
 
     return _assert_json_response
+
+
+@pytest.fixture
+def assert_hmall_success() -> Callable[[dict[str, Any]], Any]:
+    def _assert_hmall_success(payload: dict[str, Any]) -> Any:
+        assert payload.get("success") is True, payload
+        assert "resp" in payload, payload
+        return payload["resp"]
+
+    return _assert_hmall_success
