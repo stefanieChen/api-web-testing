@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "total": 1,
+  "resp": [
+    {
+      "categoryCode": "3wtshirt",
+      "categoryName": "T恤",
+      "categorySequence": 10
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "total": 2,
+  "resp": [
+    {
+      "wordId": "fixture-1",
+      "displaySequence": "1",
+      "wordName": "衬衫",
+      "word": "衬衫",
+      "id": "fixture-1"
+    },
+    {
+      "wordId": "fixture-2",
+      "displaySequence": "2",
+      "wordName": "短袖T恤",
+      "word": "短袖T恤",
+      "id": "fixture-2"
+    }
+  ]
+}

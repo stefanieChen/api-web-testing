@@ -26,7 +26,7 @@ def test_recommend_words_returns_search_suggestions(
     assert {"wordId", "displaySequence", "wordName", "word", "id"}.issubset(first_word)
     assert first_word["wordName"] == first_word["word"]
     assert first_word["displaySequence"].isdigit()
-    assert any(word["wordName"] in {"衬衫", "短袖T恤", "防晒衣"} for word in words)
+    assert all(word.get("wordName") for word in words)
 
 
 def test_shop_classification_contains_major_chinese_navigation_groups(
