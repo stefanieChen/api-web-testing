@@ -1,5 +1,7 @@
 import pytest
 
+from payloads import TSHIRT_LISTING_PAYLOAD
+
 pytestmark = pytest.mark.live_api
 
 
@@ -35,31 +37,11 @@ def test_tshirt_product_listing_returns_filter_metadata_and_products(
     assert_json_response,
     assert_hmall_success,
 ):
-    listing_payload = {
-        "url": "/c/3wtshirt.html",
-        "pageInfo": {"page": 1, "pageSize": 20, "withSideBar": "Y"},
-        "belongTo": "pc",
-        "rank": "overall",
-        "priceRange": {"low": 0, "high": 0},
-        "color": [],
-        "size": [],
-        "season": [],
-        "material": [],
-        "sex": [],
-        "categoryFilter": {},
-        "identity": [],
-        "insiteDescription": "",
-        "exist": [],
-        "categoryCode": "3wtshirt",
-        "searchFlag": False,
-        "description": "",
-    }
-
     response = request_or_skip(
         api_client,
         "POST",
         f"{api_base_url}/hmall-sc-service/search/searchWithCategoryCodeAndConditions/zh_CN",
-        json=listing_payload,
+        json=TSHIRT_LISTING_PAYLOAD,
     )
     payload = assert_json_response(response)
     response_sections = assert_hmall_success(payload)

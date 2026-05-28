@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "title": "女装",
+      "link": "/women",
+      "list": [
+        {
+          "childData": [
+            {"title": "T恤"}
+          ]
+        }
+      ]
+    },
+    {"title": "男装", "link": "/men", "list": []},
+    {"title": "童装", "link": "/kids", "list": []},
+    {"title": "婴幼儿装", "link": "/baby", "list": []}
+  ]
+}

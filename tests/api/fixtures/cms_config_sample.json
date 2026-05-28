@@ -1,0 +1,6 @@
+{
+  "version": "fixture",
+  "features": {
+    "searchEnabled": true
+  }
+}

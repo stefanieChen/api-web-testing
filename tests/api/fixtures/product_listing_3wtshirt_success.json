@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "resp": [
+    [
+      {"name": "尺码"},
+      {"name": "颜色"}
+    ],
+    [
+      {
+        "code": "1234567",
+        "name": "Fixture T-Shirt",
+        "name4zhCN": "圆领T恤",
+        "minPrice": 79,
+        "maxPrice": 99,
+        "stock": "Y"
+      }
+    ],
+    {
+      "productSum": 1
+    }
+  ]
+}

@@ -77,13 +77,19 @@ paths:
 ├── .cursor/
 │   └── skills/
 │       ├── api-testing/
-│       │   └── SKILL.md
+│       │   ├── SKILL.md
+│       │   └── reference.md
 │       └── web-ui-testing/
 │           └── SKILL.md
 ├── tests/
 │   ├── api/
 │   │   ├── conftest.py
+│   │   ├── payloads.py
+│   │   ├── fixtures/
+│   │   ├── scripts/validate_fixtures.py
 │   │   ├── test_uniqlo_category_search.py
+│   │   ├── test_uniqlo_cms_data.py
+│   │   ├── test_uniqlo_offline_contracts.py
 │   │   └── test_uniqlo_site_data.py
 │   └── web/
 │       ├── navigation.spec.ts
@@ -109,6 +115,10 @@ paths:
 | `tests/api/conftest.py` | API 测试共享 fixtures：优衣库 API/web base URL、requests session、请求失败 skip、JSON/Hmall envelope 断言 |
 | `tests/api/test_uniqlo_category_search.py` | 优衣库 `hmall-sc-service` 分类元数据与商品列表接口演示测试 |
 | `tests/api/test_uniqlo_site_data.py` | 优衣库推荐词接口与 PC 分类 JSON 资源演示测试 |
+| `tests/api/test_uniqlo_cms_data.py` | CMS 配置 JSON  live 演示测试 |
+| `tests/api/test_uniqlo_offline_contracts.py` | 基于 fixtures 的离线契约测试（CI 无需外网） |
+| `tests/api/fixtures/` | 录制的 API 响应样本，供 offline_contract 使用 |
+| `.cursor/skills/api-testing/reference.md` | 端点目录、fixture 说明、skip/fail 规则 |
 | `package.json` | Node 项目与 Playwright 测试脚本 |
 | `tsconfig.json` | TypeScript 编译/类型检查配置 |
 | `playwright.config.ts` | Playwright 配置：Chromium、中文 locale、上海时区、trace/screenshot/video |
