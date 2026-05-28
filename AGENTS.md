@@ -2,17 +2,19 @@
 
 ## Cursor Cloud specific instructions
 
-This repository (`api-web-testing`) is currently empty — it contains only a `README.md`. There is no application code, no dependency manifests, no tests, and no services to run.
+This is a test-generation PoC with two stacks:
 
-### Environment
+- **API tests** (Python): `python3 -m pytest tests/api -q`
+- **Web UI tests** (Playwright/TypeScript): `npm run test:web`
+- **Type check**: `npx tsc --noEmit`
 
-The Cloud VM comes pre-installed with:
-- Node.js v22 (with npm, pnpm, yarn)
-- Python 3.12
-- Go 1.22
-- Rust 1.83
-- Java 21 (OpenJDK)
+### Non-obvious caveats
 
-### When code is added
+- `pip install` defaults to `--user` in this environment; pytest lands in `/home/ubuntu/.local/bin`. Ensure `PATH` includes that directory (the update script handles this via the `--break-system-packages` flag or user install).
+- API and Playwright web tests target live UNIQLO China endpoints/sites (`d.uniqlo.cn`, `www.uniqlo.cn`). Tests are designed to **skip gracefully** when the target is unreachable or rate-limited — this is expected, not a failure.
+- `npm run test:web` uses headless Chromium only; the browser binary is cached under `~/.cache/ms-playwright/`.
+- The `main` branch is essentially empty. Development work is on feature branches (e.g. `cursor/api-web-skills-poc-04c6`).
 
-Once source code and dependency files are added to this repository, the update script and this document should be updated accordingly. Look for `package.json`, `requirements.txt`, `pyproject.toml`, `go.mod`, `Cargo.toml`, or similar files to determine the correct dependency installation commands.
+### Running services
+
+No local services are required — all test targets are external public APIs/websites.
